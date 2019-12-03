@@ -1,0 +1,6 @@
+D:\Users\BarbaraMaren\source\repos\TcxDecode\TcxDecode\bin\Debug\TcxDecode.dll
+D:\Users\BarbaraMaren\source\repos\TcxDecode\TcxDecode\bin\Debug\TcxDecode.pdb
+D:\Users\BarbaraMaren\source\repos\TcxDecode\TcxDecode\obj\Debug\TcxDecode.csprojAssemblyReference.cache
+D:\Users\BarbaraMaren\source\repos\TcxDecode\TcxDecode\obj\Debug\TcxDecode.csproj.CoreCompileInputs.cache
+D:\Users\BarbaraMaren\source\repos\TcxDecode\TcxDecode\obj\Debug\TcxDecode.dll
+D:\Users\BarbaraMaren\source\repos\TcxDecode\TcxDecode\obj\Debug\TcxDecode.pdb

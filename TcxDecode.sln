@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcxDecode", "TcxDecode\TcxDecode.csproj", "{FE7F8947-50EA-43F4-94E0-7D831C9CB0BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tcx2Csv", "Tcx2Csv\Tcx2Csv.csproj", "{712E05FA-5FC6-4ED4-AD0D-B2745C87526B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcxChart", "TcxChart\TcxChart.csproj", "{EEF73A8C-2321-48B7-B626-D109657B29DB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE7F8947-50EA-43F4-94E0-7D831C9CB0BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE7F8947-50EA-43F4-94E0-7D831C9CB0BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE7F8947-50EA-43F4-94E0-7D831C9CB0BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE7F8947-50EA-43F4-94E0-7D831C9CB0BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{712E05FA-5FC6-4ED4-AD0D-B2745C87526B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{712E05FA-5FC6-4ED4-AD0D-B2745C87526B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{712E05FA-5FC6-4ED4-AD0D-B2745C87526B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{712E05FA-5FC6-4ED4-AD0D-B2745C87526B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {99C9B34E-4653-44E1-96B8-7F88E00684F8}
+	EndGlobalSection
+EndGlobal
