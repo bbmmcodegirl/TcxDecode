@@ -9,6 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tcx2Csv", "Tcx2Csv\Tcx2Csv.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcxChart", "TcxChart\TcxChart.csproj", "{EEF73A8C-2321-48B7-B626-D109657B29DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{50039924-A108-4667-8009-84CF7F04351B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{04BA973B-B7AB-4AD7-8CF1-638D3B8578DF}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +34,10 @@ Global
 		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEF73A8C-2321-48B7-B626-D109657B29DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50039924-A108-4667-8009-84CF7F04351B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50039924-A108-4667-8009-84CF7F04351B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50039924-A108-4667-8009-84CF7F04351B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50039924-A108-4667-8009-84CF7F04351B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

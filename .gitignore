@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Tcx2Csv
+/TcxChart/bin/Debug
+/TcxChart/obj/Debug/TempPE
+/TcxChart/obj/Debug

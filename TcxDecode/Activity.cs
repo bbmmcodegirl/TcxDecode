@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Device.Location;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace TcxDecode
 {
+    [Serializable]
     public class Activity
     {
+        public string Name { get; set; }
+
         public string Sport { get; set; }
 
         public string Creator { get; set; }
 
-        public Lap[] Laps { get; private set; } = new Lap[] { };
+        public Lap[] Laps { get; set; } = new Lap[] { };
 
         public static Activity Parse(XElement element)
         {
@@ -42,6 +47,7 @@ namespace TcxDecode
         }
     }
 
+    [Serializable]
     public class TrackPoint
     {
         public DateTime Time { get; set; }
@@ -56,8 +62,11 @@ namespace TcxDecode
 
         public double Speed { get; set; }
 
-        public double RunCadence { get; set; }
+        public double SpeedKmH { get => Speed * 3.6; }
 
+        public double RunCadence { get; set; }
+        public TimeSpan Interval { get; set; }
+        public double DistanceCoveredMeters { get; set; }
 
         public static TrackPoint Parse(XElement element)
         {
@@ -128,10 +137,19 @@ namespace TcxDecode
 
     }
 
+    [Serializable]
     public class Position
     {
         public double LatitudeDegrees { get; set; }
         public double LongitudeDegrees { get; set; }
+
+        [XmlIgnore]
+        public GeoCoordinate Coordinate { get => new GeoCoordinate(LatitudeDegrees, LongitudeDegrees); }
+
+        public double DistanceTo(Position other)
+        {
+            return this.Coordinate.GetDistanceTo(other.Coordinate);
+        }
 
         public static Position Parse(XElement element)
         {
@@ -161,6 +179,7 @@ namespace TcxDecode
         }
     }
 
+    [Serializable]
     public class Track
     {
         public TrackPoint[] TrackPoints { get; set; } = new TrackPoint[] { };
@@ -182,6 +201,7 @@ namespace TcxDecode
         }
     }
 
+    [Serializable]
     public class Lap
     {
         public string Name { get; set; }
@@ -191,7 +211,10 @@ namespace TcxDecode
         public int Calories { get; set; }
         public string Intensity { get; set; }
         public string TriggerMethod { get; set; }
-        public Track Track { get; private set;  } = new Track();
+        public Pace TargetPace { get; set; }
+        public Pace TargetMinPace { get; set; }
+        public Pace TargetMaxPace { get; set; }
+        public Track Track { get; set;  } = new Track();
 
         public static Lap Parse(XElement element)
         {
