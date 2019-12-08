@@ -69,6 +69,21 @@ namespace TcxChart
             return activity.activity;
         }
 
+        bool _doShowSpeed = true;
+        bool _doShowTargetSpeed = false;
+        bool _doShowCadence = false;
+        bool _doShowHeartRate = true;
+        bool _doShowElevation = false;
+        bool _doShowElevationChange = false;
+
+        public bool DoShowSpeed                        { get => _doShowSpeed             ;  set { _doShowSpeed                = value; Notify(); } }
+        public bool DoShowTargetSpeed                  { get => _doShowTargetSpeed       ;  set { _doShowTargetSpeed          = value; Notify(); } }
+        public bool DoShowCadence                      { get => _doShowCadence           ;  set { _doShowCadence              = value; Notify(); } }
+        public bool DoShowHeartRate                    { get => _doShowHeartRate         ;  set { _doShowHeartRate            = value; Notify(); } }
+        public bool DoShowElevation                    { get => _doShowElevation         ;  set { _doShowElevation            = value; Notify(); } }
+        public bool DoShowElevationChange              { get => _doShowElevationChange   ;  set { _doShowElevationChange      = value; Notify(); } }
+
+
         public List<LapViewModel> Laps { get; private set; }
 
         public string Name
@@ -145,7 +160,13 @@ namespace TcxChart
 
         public double AverageSpeed
         {
-            get => Laps.SelectMany(l => l.TrackPoints).Average(t => t.Speed);
+            get => Duration.TotalHours <= 0 ? 0 : Distance / Duration.TotalHours;
+        }
+
+        public double AverageSpeedInMotion
+        {
+            get => Duration.TotalHours <= 0 ? 0 : Laps.SelectMany(l => l.TrackPoints).Where(t => t.DistanceCoveredMeters > 0).Sum(t => t.DistanceCoveredMeters)
+                / (1000.0*Laps.SelectMany(l => l.TrackPoints).Where(t => t.DistanceCoveredMeters > 0).Sum(t => t.Interval.TotalHours));
         }
 
         public Pace BestPace
@@ -166,6 +187,16 @@ namespace TcxChart
         public int AverageHeartRate
         {
             get => (int)Math.Round(Laps.SelectMany(l => l.TrackPoints).Average(t => (double)t.HeartRateBpm));
+        }
+
+        public double TotalAscent
+        {
+            get => Laps.Sum(l => l.Ascent);
+        }
+
+        public double TotalDescent
+        {
+            get => Laps.Sum(l => l.Descent);
         }
 
         public List<PropertyType> GetTimeLine<PropertyType>(string propertyName, int numPoints, double startFraction = 0, double lengthFraction = 1)
@@ -197,6 +228,28 @@ namespace TcxChart
                     var offset = TimeSpan.FromSeconds((int)(length.TotalSeconds * i / numPoints));
                     var timePoint = startTime + offset;
                     var containingLaps = Laps.Where(l => l.StartTime <= timePoint && l.EndTime >= timePoint).ToList();
+                    if (!containingLaps.Any())
+                    {
+                        var sucessorLaps = Laps.Zip(Laps.Skip(1), (p, n) => new { previous = p, next = n }).ToList();
+                        var laps = sucessorLaps.Where(h => h.previous.EndTime <= timePoint && h.next.StartTime >= timePoint).FirstOrDefault();
+                        if (laps != null)
+                        {
+                            if (trackpointProperty != null)
+                            {
+                                var trackPoint = laps.next.TrackPoints.FirstOrDefault();
+                                if (trackPoint != null)
+                                {
+                                    var value = (PropertyType)trackpointProperty.GetMethod.Invoke(trackPoint, noParameters);
+                                    return value;
+                                }
+                            }
+                            if (lapProperty != null)
+                            {
+                                var value = (PropertyType)lapProperty.GetMethod.Invoke(laps.previous, noParameters);
+                                return value;
+                            }
+                        }
+                    }
                     foreach (var lap in containingLaps)
                     {
                         if (trackpointProperty != null)
@@ -218,6 +271,22 @@ namespace TcxChart
                                                 if (previousPoint != null)
                                                 {
                                                     trackPoint = previousPoint;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    var lastPoint = lap.TrackPoints.LastOrDefault();
+                                    if (lastPoint.Time <= timePoint)
+                                    {
+                                        if (lap.Index < Laps.Count - 1)
+                                        {
+                                            var nextLap = Laps.FirstOrDefault(l => l.Index == lap.Index + 1);
+                                            if (nextLap != null)
+                                            {
+                                                var nextPoint = nextLap.TrackPoints.FirstOrDefault();
+                                                if (nextPoint != null)
+                                                {
+                                                    trackPoint = nextPoint;
                                                 }
                                             }
                                         }

@@ -43,31 +43,33 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Sport"/>
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="StartTime"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Start Time"/>
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Duration"/>
             
             <TextBlock Grid.Row="0" Grid.Column="2" Text="Distance"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="MaxSpeed"/>
-            <TextBlock Grid.Row="2" Grid.Column="2" Text="AverageSpeed"/>
-            <TextBlock Grid.Row="3" Grid.Column="2" Text="BestPace"/>
-            
-            <TextBlock Grid.Row="0" Grid.Column="4" Text="AveragePace"/>
-            <TextBlock Grid.Row="1" Grid.Column="4" Text="MaxHeartRate"/>
-            <TextBlock Grid.Row="2" Grid.Column="4" Text="AverageHeartRate"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="Max Speed"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="Average Speed"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="Average Speed in Motion"/>
 
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Sport}"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding StartTime}"/>
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Duration}"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Best Pace"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="Average Pace"/>
+            <TextBlock Grid.Row="2" Grid.Column="4" Text="Max Heart Rate"/>
+            <TextBlock Grid.Row="3" Grid.Column="4" Text="Average Heart Rate"/>
+
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Margin="5,0,5,0"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Sport}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding StartTime}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Duration}" Margin="5,0,5,0"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Distance, StringFormat={}{0:##.000}km}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding MaxSpeed, StringFormat={}{0:##.00}km/h}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding AverageSpeed, StringFormat={}{0:##.00}km/h}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding AverageSpeedInMotion, StringFormat={}{0:##.00}km/h}" Margin="5,0,5,0"/>
             
-            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Distance}"/>
-            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding MaxSpeed}"/>
-            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding AverageSpeed}"/>
-            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding BestPace}"/>   
-            
-            <TextBlock Grid.Row="0" Grid.Column="5" Text="{Binding AveragePace}"/>
-            <TextBlock Grid.Row="1" Grid.Column="5" Text="{Binding MaxHeartRate}"/>
-            <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding AverageHeartRate}"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Text="{Binding BestPace}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Text="{Binding AveragePace}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding MaxHeartRate}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="3" Grid.Column="5" Text="{Binding AverageHeartRate}" Margin="5,0,5,0"/>
         </Grid>
         <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
             <DataGrid x:Name="LapsGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxHeight="300" MaxWidth="1000"
@@ -75,9 +77,27 @@
             </DataGrid>
         </ScrollViewer>
         <GridSplitter Grid.Row="2" Grid.Column="0" Height="5" HorizontalAlignment="Stretch"  ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" />
-        <StackPanel Grid.Row="3" Grid.Column="0" VerticalAlignment="Stretch">
-            <local:TimeChartView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="300"  />
-            <TextBlock HorizontalAlignment="Center" Height="Auto" Text="{Binding}" VerticalAlignment="Center" FontFamily="Segoe UI Semibold" FontSize="16" />
-        </StackPanel>
+        <Grid  Grid.Row="3" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"  VerticalAlignment="Center">
+                <TextBlock>Select data:</TextBlock>
+                <CheckBox IsChecked="{Binding DoShowSpeed}">Speed</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowTargetSpeed}">Target Speed</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowCadence}">Cadence</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowHeartRate}">Heart Rate</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowElevation}">Elevation</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowElevationChange}">Elevation Change</CheckBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1" VerticalAlignment="Stretch">
+                <local:TimeChartView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="300"  />
+                <TextBlock HorizontalAlignment="Center" Height="Auto" Text="{Binding}" VerticalAlignment="Center" FontFamily="Segoe UI Semibold" FontSize="16" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

@@ -16,6 +16,23 @@ namespace TcxChart
         {
             this.lap = lap;
             Index = index;
+            TrackPoint lastTrackPoint = null;
+            foreach(var t in TrackPoints)
+            {
+                if (lastTrackPoint != null)
+                {
+                    var altituteChange = t.AltitudeMeters - lastTrackPoint.AltitudeMeters;
+                    if (altituteChange> 0)
+                    {
+                        Ascent += altituteChange;
+                    }
+                    else
+                    {
+                        Descent += altituteChange;
+                    }
+                }
+                lastTrackPoint = t;
+            }
         }
 
         public List<TrackPoint> TrackPoints
@@ -68,6 +85,10 @@ namespace TcxChart
             }
         }
 
+        public DateTime EndTime
+        {
+            get => StartTime + TimeSpan.FromSeconds(TotalTimeSeconds);
+        }
 
         public float TotalTimeSeconds
         {
@@ -81,7 +102,17 @@ namespace TcxChart
                 lap.TotalTimeSeconds = value;
                 Notify();
                 Notify(nameof(EndTime));
+                Notify(nameof(Duration));
                 notifySpeedChanged();
+            }
+        }
+
+        public TimeSpan Duration
+        {
+            get => TimeSpan.FromSeconds(TotalTimeSeconds);
+            set
+            {
+                TotalTimeSeconds = (float)value.TotalSeconds;
             }
         }
 
@@ -102,6 +133,64 @@ namespace TcxChart
             }
         }
 
+        public double DistanceKm
+        {
+            get => DistanceMeters / 1000;
+        }
+
+        public double AverageSpeedMetresS
+        {
+            get => TotalTimeSeconds > 0 ? DistanceMeters / TotalTimeSeconds : 0;
+        }
+
+        public double AverageSpeedKmH
+        {
+            get => AverageSpeedMetresS * 3.6;
+        }
+
+        public Pace AveragePace
+        {
+            get => AverageSpeedKmH ;
+        }
+
+        public double AverageHeartRateBpm
+        {
+            get 
+            {
+                var totalSeconds = lap.Track.TrackPoints.Sum(t => t.Interval.TotalSeconds);
+                return totalSeconds <= 0 ? 0 : lap.Track.TrackPoints.Sum(t => (double)t.HeartRateBpm * t.Interval.TotalSeconds) / totalSeconds;
+            }
+        }
+
+        public double MaxSpeedMetresS
+        {
+            get => lap.Track.TrackPoints.Max(t => t.Speed);
+        }
+
+        public double MaxSpeedKmH
+        {
+            get => MaxSpeedMetresS * 3.6;
+        }
+
+        public Pace BestPace
+        {
+            get => MaxSpeedKmH;
+        }
+
+        public int MaxHeartRateBpm
+        {
+            get => lap.Track.TrackPoints.Max(t => t.HeartRateBpm);
+        }
+
+        public double Ascent
+        {
+            get; 
+        }
+
+        public double Descent
+        {
+            get;
+        }
 
         public int Calories
         {
@@ -145,56 +234,6 @@ namespace TcxChart
                 lap.TriggerMethod = value;
                 Notify();
             }
-        }
-
-        public DateTime EndTime
-        {
-            get => StartTime + TimeSpan.FromSeconds(TotalTimeSeconds);
-        }
-
-        public double DistanceKm
-        {
-            get => DistanceMeters / 1000;
-        }
-
-        public double AverageSpeedMetresS
-        {
-            get => TotalTimeSeconds > 0 ? DistanceMeters / TotalTimeSeconds : 0;
-        }
-
-        public double AverageSpeedKmH
-        {
-            get => AverageSpeedMetresS * 3.6;
-        }
-
-        public Pace AveragePace
-        {
-            get => AverageSpeedKmH ;
-        }
-
-        public double MaxSpeedMetresS
-        {
-            get => lap.Track.TrackPoints.Max(t => t.Speed);
-        }
-
-        public double MaxSpeedKmH
-        {
-            get => MaxSpeedMetresS * 3.6;
-        }
-
-        public int MaxHeartRateBpm
-        {
-            get => lap.Track.TrackPoints.Max(t => t.HeartRateBpm);
-        }
-
-        public double AverageHeartRateBpm
-        {
-            get => lap.Track.TrackPoints.Average(t => (double)t.HeartRateBpm);
-        }
-
-        public Pace BestPace
-        {
-            get => MaxSpeedKmH;
         }
 
         private void notifySpeedChanged()
