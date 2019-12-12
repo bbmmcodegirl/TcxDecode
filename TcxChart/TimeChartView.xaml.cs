@@ -45,6 +45,89 @@ namespace TcxChart
             int numPoints = (int)this.ActualWidth / 2;
             var xValues = ViewModel.GetTimeSeries(numPoints);
 
+            var maxHeartRate = ViewModel.MaxHeartRate;
+            var maxSpeed = ViewModel.MaxSpeed;
+            var maxCadence = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.RunCadence);
+            var maxElevation = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.AltitudeMeters);
+
+            TimeChart.AxisY.Clear();
+
+            bool showAnySpeed = ViewModel.DoShowSpeed || ViewModel.DoShowTargetSpeed;
+            bool showAnyHeartRate = ViewModel.DoShowHeartRate;
+            bool showAnyPace = ViewModel.DoShowPace || ViewModel.DoShowTargetPace;
+            bool showAnyElevation = ViewModel.DoShowElevation || ViewModel.DoShowElevationChange;
+            bool showAnyCadence = ViewModel.DoShowCadence;
+
+            int speedAxisIndex = -1;
+            int heartRateAxisIndex = -1;
+            int paceAxisIndex = -1;
+            int elevationAxisIndex = -1;
+            int cadenceAxisIndex = -1;
+            if (showAnySpeed)
+            {
+                var speedAxis = new Axis()
+                {
+                    Title = "Speed",
+                    Foreground = System.Windows.Media.Brushes.DodgerBlue,
+                    LabelFormatter = value =>
+                    {
+                        return value.ToString("0.0");
+                    }
+                };
+                speedAxisIndex = TimeChart.AxisY.Count;
+                TimeChart.AxisY.Add(speedAxis);
+            }
+            if (showAnyHeartRate)
+            {
+                var heartRateAxis = new Axis()
+                {
+                    Title = "HeartRate (bpm)",
+                    Foreground = System.Windows.Media.Brushes.IndianRed,
+                    LabelFormatter = value =>
+                    {
+                        return value.ToString("0");
+                    },
+                    Position=AxisPosition.RightTop
+                };
+                heartRateAxisIndex = TimeChart.AxisY.Count;
+                TimeChart.AxisY.Add(heartRateAxis);
+            }
+            if (showAnyPace)
+            {
+                var paceAxis = new Axis()
+                {
+                    Title = "Pace (min/km)",
+                    Foreground = System.Windows.Media.Brushes.DarkOliveGreen,
+                    LabelFormatter = value => new Pace(value).ToString(),
+                };
+                paceAxisIndex = TimeChart.AxisY.Count;
+                TimeChart.AxisY.Add(paceAxis);
+            }
+            if (showAnyElevation)
+            {
+                var elevationAxis = new Axis()
+                {
+                    Title = "Elevation (m)",
+                    Foreground = System.Windows.Media.Brushes.Black,
+                    LabelFormatter = value => value.ToString("0"),
+                    Position = AxisPosition.RightTop
+                };
+                elevationAxisIndex = TimeChart.AxisY.Count;
+                TimeChart.AxisY.Add(elevationAxis);
+            }
+            if (showAnyCadence)
+            {
+                var cadenceAxis = new Axis()
+                {
+                    Title = "Cadence (steps/min)",
+                    Foreground = System.Windows.Media.Brushes.Magenta,
+                    LabelFormatter = value => value.ToString("0"),
+                    Position = AxisPosition.RightTop
+                };
+                cadenceAxisIndex = TimeChart.AxisY.Count;
+                TimeChart.AxisY.Add(cadenceAxis);
+            }
+
             var seriesCollection = new SeriesCollection();
             TimeChart.Series.Clear();
 
@@ -58,17 +141,32 @@ namespace TcxChart
                     PointGeometry = null,
                     Fill = Brushes.Transparent,
                     LineSmoothness = 1,
+                    Stroke = TimeChart.AxisY[speedAxisIndex].Foreground,
+                    ScalesYAt = speedAxisIndex
+                };
+                seriesCollection.Add(series);
+            }
+
+            if (ViewModel.DoShowPace)
+            {
+                var speeds = ViewModel.GetTimeLine<double>(nameof(TrackPoint.SpeedKmH), numPoints);
+                var series = new LineSeries
+                {
+                    Title = "Pace",
+                    Values = new ChartValues<double>(speeds),
+                    PointGeometry = null,
+                    Fill = Brushes.Transparent,
+                    LineSmoothness = 1,
+                    LabelPoint = chartPoint => $"{new Pace(chartPoint.Y).ToString()}min/km",
+                    Stroke = TimeChart.AxisY[paceAxisIndex].Foreground,
+                    ScalesYAt = paceAxisIndex
                 };
                 seriesCollection.Add(series);
             }
 
             if (ViewModel.DoShowHeartRate)
             {
-                var maxHeartRate = ViewModel.MaxHeartRate;
-                var maxSpeed = ViewModel.MaxSpeed;
-                var hrToSpeedFactor = maxSpeed / maxHeartRate;
-
-                var heartRates = ViewModel.GetTimeLine<int>(nameof(TrackPoint.HeartRateBpm), numPoints).Select(hr => ((double)hr * hrToSpeedFactor)).ToList();
+                var heartRates = ViewModel.GetTimeLine<int>(nameof(TrackPoint.HeartRateBpm), numPoints).Select(hr => ((double)hr)).ToList();
                 var series = new LineSeries
                 {
                     Title = "HeartRate",
@@ -76,7 +174,9 @@ namespace TcxChart
                     PointGeometry = null,
                     Fill = Brushes.Transparent,
                     LineSmoothness = 0,
-                    LabelPoint = chartPoint => $"{chartPoint.Y / hrToSpeedFactor}bpm",
+                    LabelPoint = chartPoint => $"{chartPoint.Y.ToString("0")}bpm",
+                    Stroke = TimeChart.AxisY[heartRateAxisIndex].Foreground,
+                    ScalesYAt = heartRateAxisIndex
                 };
                 seriesCollection.Add(series);
             }
@@ -84,25 +184,43 @@ namespace TcxChart
             if (ViewModel.DoShowTargetSpeed)
             {
                 var targetSpeeds = ViewModel.GetTimeLine<double>(nameof(LapViewModel.TargetSpeed), numPoints);
-                seriesCollection.Add(new StepLineSeries
+                var series = new StepLineSeries
                 {
                     Title = "Target Speed",
                     Fill = Brushes.Transparent,
                     Values = new ChartValues<double>(targetSpeeds),
                     PointGeometry = null,
                     AlternativeStroke = Brushes.Transparent,
-                });
+                    Stroke = TimeChart.AxisY[speedAxisIndex].Foreground.Clone(),
+                    ScalesYAt = speedAxisIndex
+                };
+                series.Stroke.Opacity = 0.7;
+                seriesCollection.Add(series);
+            }
+
+            if (ViewModel.DoShowTargetPace)
+            {
+                var targetSpeeds = ViewModel.GetTimeLine<double>(nameof(LapViewModel.TargetSpeed), numPoints);
+                var series = new StepLineSeries
+                {
+                    Title = "Target Pace",
+                    Fill = Brushes.Transparent,
+                    Values = new ChartValues<double>(targetSpeeds),
+                    PointGeometry = null,
+                    AlternativeStroke = Brushes.Transparent,
+                    LabelPoint = chartPoint => $"{new Pace(chartPoint.Y).ToString()}min/km",
+                    Stroke = TimeChart.AxisY[paceAxisIndex].Foreground.Clone(),
+                    ScalesYAt = paceAxisIndex
+                };
+                series.Stroke.Opacity = 0.7;
+                seriesCollection.Add(series);
             }
 
             if (ViewModel.DoShowCadence)
             {
-                var maxCadence = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.RunCadence);
                 if (maxCadence > 0)
                 {
-                    var maxSpeed = ViewModel.MaxSpeed;
-                    var cadenceToSpeedFactor = maxSpeed / maxCadence;
-
-                    var cadences = ViewModel.GetTimeLine<double>(nameof(TrackPoint.RunCadence), numPoints).Select(cd => ((double)cd * cadenceToSpeedFactor)).ToList();
+                    var cadences = ViewModel.GetTimeLine<double>(nameof(TrackPoint.RunCadence), numPoints);
                     var series = new LineSeries
                     {
                         Title = "Cadence",
@@ -110,7 +228,9 @@ namespace TcxChart
                         PointGeometry = null,
                         Fill = Brushes.Transparent,
                         LineSmoothness = 0,
-                        LabelPoint = chartPoint => $"{chartPoint.Y / cadenceToSpeedFactor} steps/min",
+                        LabelPoint = chartPoint => $"{chartPoint.Y.ToString("0")} steps/min",
+                        Stroke = TimeChart.AxisY[cadenceAxisIndex].Foreground,
+                        ScalesYAt = cadenceAxisIndex
                     };
                     seriesCollection.Add(series);
                 }
@@ -118,13 +238,9 @@ namespace TcxChart
 
             if (ViewModel.DoShowElevation)
             {
-                var maxElevation = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.AltitudeMeters);
                 if (maxElevation > 0)
                 {
-                    var maxSpeed = ViewModel.MaxSpeed;
-                    var elevationToSpeedFactor = maxSpeed / maxElevation;
-
-                    var elevations = ViewModel.GetTimeLine<double>(nameof(TrackPoint.AltitudeMeters), numPoints).Select(e => ((double)e * elevationToSpeedFactor)).ToList();
+                    var elevations = ViewModel.GetTimeLine<double>(nameof(TrackPoint.AltitudeMeters), numPoints);
                     var series = new LineSeries
                     {
                         Title = "Elevation",
@@ -132,7 +248,9 @@ namespace TcxChart
                         PointGeometry = null,
                         Fill = Brushes.Transparent,
                         LineSmoothness = 0,
-                        LabelPoint = chartPoint => $"{chartPoint.Y / elevationToSpeedFactor} m",
+                        LabelPoint = chartPoint => $"{chartPoint.Y.ToString("0.0")} m",
+                        Stroke = TimeChart.AxisY[elevationAxisIndex].Foreground,
+                        ScalesYAt = elevationAxisIndex
                     };
                     seriesCollection.Add(series);
                 }
@@ -140,11 +258,8 @@ namespace TcxChart
 
             if (ViewModel.DoShowElevationChange && ViewModel.Laps.SelectMany(l => l.TrackPoints).Any())
             {
-                var maxElevation = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.AltitudeMeters);
-                var maxSpeed = ViewModel.MaxSpeed;
                 if (maxElevation > 0 && maxSpeed > 0)
                 {
-
                     var elevations = ViewModel.GetTimeLine<double>(nameof(TrackPoint.AltitudeMeters), numPoints).ToList();
                     var elevationChanges = new List<Double>();
                     elevationChanges.Add(0);
@@ -158,7 +273,6 @@ namespace TcxChart
                     var totalChangeExtent = maxChange - minChange;
                     if (totalChangeExtent > 0)
                     {
-                        var elevationChangeToSpeedFactor = maxSpeed / totalChangeExtent;
                         var series = new LineSeries
                         {
                             Title = "Elevation Change",
@@ -166,21 +280,17 @@ namespace TcxChart
                             PointGeometry = null,
                             Fill = Brushes.Transparent,
                             LineSmoothness = 0,
-                            LabelPoint = chartPoint => $"{chartPoint.Y / elevationChangeToSpeedFactor} m",
+                            LabelPoint = chartPoint => $"{chartPoint.Y} m",
+                            Stroke = TimeChart.AxisY[elevationAxisIndex].Foreground.Clone(),
+                            ScalesYAt = elevationAxisIndex
                         };
+                        series.Stroke.Opacity = 0.7;
                         seriesCollection.Add(series);
                     }
                 }
             }
 
             TimeChart.Series.AddRange(seriesCollection);
-
-            TimeChart.AxisY.Clear();
-            var speedAxis = new Axis()
-            {
-                LabelFormatter = value => value.ToString()
-            };
-            TimeChart.AxisY.Add(speedAxis); // TODO try to have multiple different axes for speed and heartrate
 
             TimeChart.AxisX.Clear();
             var timeAxis = new Axis()

@@ -67,6 +67,18 @@ namespace TcxChart
             {
                 lap.TargetPace = value;
                 Notify();
+                Notify(nameof(TargetPace));
+            }
+        }
+
+        public Pace TargetPace
+        {
+            get => lap.TargetPace;
+            set
+            {
+                lap.TargetPace = value;
+                Notify();
+                Notify(nameof(TargetSpeed));
             }
         }
 

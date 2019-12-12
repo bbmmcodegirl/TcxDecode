@@ -24,9 +24,21 @@ namespace TcxDecode
         {
             if (speedKmH <= 0)
             {
-                return new Pace(0);
+                return new Pace();
             }
             return new Pace(speedKmH);
+        }
+
+        public static implicit operator Pace(string formattedPace)
+        {
+            try
+            {
+                return Parse(formattedPace);
+            }
+            catch
+            {
+                return new Pace();
+            }
         }
 
         public Pace(TimeSpan timeSpan)

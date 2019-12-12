@@ -8,7 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="300"
              DataContextChanged="OnDataContextChanged">
     <Grid>
-        <lvc:CartesianChart x:Name="TimeChart" LegendLocation="Right" DisableAnimations="True" />
+        <lvc:CartesianChart x:Name="TimeChart"  DisableAnimations="True" />
 
     </Grid>
 </UserControl>

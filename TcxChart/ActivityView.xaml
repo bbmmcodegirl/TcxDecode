@@ -89,6 +89,8 @@
                 <TextBlock>Select data:</TextBlock>
                 <CheckBox IsChecked="{Binding DoShowSpeed}">Speed</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowTargetSpeed}">Target Speed</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowPace}">Pace</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowTargetPace}">Target Pace</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowCadence}">Cadence</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowHeartRate}">Heart Rate</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowElevation}">Elevation</CheckBox>

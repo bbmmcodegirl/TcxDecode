@@ -59,10 +59,37 @@ namespace TcxChart
             {
                 e.Column.Header = "Average Pace";
             }
+            else if (e.PropertyName == nameof(LapViewModel.TargetSpeed))
+            {
+                e.Column.Header = "Target Speed";
+                DataGridTextColumn dataGridTextColumn = e.Column as DataGridTextColumn;
+                if (dataGridTextColumn != null)
+                {
+                    dataGridTextColumn.Binding.StringFormat = @"{0:n2} km/h";
+                }
+            }
+            else if (e.PropertyName == nameof(LapViewModel.TargetPace))
+            {
+                e.Column.Header = "Target Pace";
+                DataGridTextColumn dataGridTextColumn = e.Column as DataGridTextColumn;
+                if (dataGridTextColumn != null)
+                {
+                    var binding = dataGridTextColumn.Binding as Binding;
+                    if (binding == null)
+                    {
+                        dataGridTextColumn.Binding = new Binding(e.PropertyName) { Converter = new StringToPaceConverter(), Mode = BindingMode.TwoWay };
+                    }
+                    else
+                    {
+                        binding.Converter = new StringToPaceConverter();
+                        binding.Mode = BindingMode.TwoWay;
+                    }
+                }
+            }
             else if (e.PropertyName == nameof(LapViewModel.AverageSpeedKmH))
             {
-                DataGridTextColumn dataGridTextColumn = e.Column as DataGridTextColumn;
                 e.Column.Header = "Average Speed";
+                DataGridTextColumn dataGridTextColumn = e.Column as DataGridTextColumn;
                 if (dataGridTextColumn != null)
                 {
                     dataGridTextColumn.Binding.StringFormat = @"{0:n2} km/h";

@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="ActivityViewModel.cs" />
     <Compile Include="ExistenceToVisiblityConverter.cs" />
+    <Compile Include="StringToPaceConverter.cs" />
     <Compile Include="TcxChartViewModel.cs" />
     <Page Include="ActivityView.xaml">
       <SubType>Designer</SubType>

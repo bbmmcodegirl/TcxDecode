@@ -71,6 +71,8 @@ namespace TcxChart
 
         bool _doShowSpeed = true;
         bool _doShowTargetSpeed = false;
+        bool _doShowPace = false;
+        bool _doShowTargetPace = false;
         bool _doShowCadence = false;
         bool _doShowHeartRate = true;
         bool _doShowElevation = false;
@@ -78,6 +80,8 @@ namespace TcxChart
 
         public bool DoShowSpeed                        { get => _doShowSpeed             ;  set { _doShowSpeed                = value; Notify(); } }
         public bool DoShowTargetSpeed                  { get => _doShowTargetSpeed       ;  set { _doShowTargetSpeed          = value; Notify(); } }
+        public bool DoShowPace                         { get => _doShowPace              ;  set { _doShowPace                = value; Notify(); } }
+        public bool DoShowTargetPace                   { get => _doShowTargetPace        ;  set { _doShowTargetPace          = value; Notify(); } }
         public bool DoShowCadence                      { get => _doShowCadence           ;  set { _doShowCadence              = value; Notify(); } }
         public bool DoShowHeartRate                    { get => _doShowHeartRate         ;  set { _doShowHeartRate            = value; Notify(); } }
         public bool DoShowElevation                    { get => _doShowElevation         ;  set { _doShowElevation            = value; Notify(); } }
