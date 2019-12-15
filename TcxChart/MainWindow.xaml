@@ -9,28 +9,62 @@
     <Window.Resources>
         <local:ExistenceToVisiblityConverter x:Key="existenceToVisibilityConverter" />
         <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+        <Style x:Key="SportButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid x:Name="grid" TextBlock.Foreground ="Black">
+                            <Border x:Name="border" CornerRadius="8" BorderBrush="Black" BorderThickness="2" Padding="4,2" Background="LightGray">
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"
+                                          TextElement.FontWeight="Bold">
+                                </ContentPresenter>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="TextBlock.Foreground" TargetName="grid" Value="White"/>
+                                <Setter Property="Background" TargetName="border" Value="DarkGray" />
+                                <Setter Property="Padding" TargetName="border" Value="4" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" TargetName="grid" Value="0.25"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid  VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <ListView  Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" ItemsSource="{Binding Activities}" SelectionChanged="ListView_SelectionChanged" >
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsDirty}" Value="True">
-                            <Setter Property="FontWeight" Value="Bold" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
-        <Button x:Name="SaveButton" Grid.Row="1"  Visibility="{Binding IsDirty, Converter={StaticResource booleanToVisibilityConverter}}" Click="save_click" MaxHeight="60">Save</Button>
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="5">
+            <WrapPanel x:Name="sportFiltersPanel">
+                <ToggleButton Style="{StaticResource SportButtonStyle}">Hallo</ToggleButton>
+            </WrapPanel>
+            <ListView x:Name="ActivitiesListView" ItemsSource="{Binding Activities}" SelectionChanged="ListView_SelectionChanged" >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDirty}" Value="True">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </StackPanel>
+        <Button x:Name="SaveButton" Grid.Row="2"  Visibility="{Binding IsDirty, Converter={StaticResource booleanToVisibilityConverter}}" Click="save_click" MaxHeight="60">Save</Button>
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Visibility="{Binding CurrentActivity, Converter={StaticResource existenceToVisibilityConverter}}">
             <local:ActivityView Margin="10" DataContext="{Binding CurrentActivity}" VerticalAlignment="Stretch"/>
         </StackPanel>

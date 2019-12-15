@@ -152,12 +152,28 @@ namespace TcxChart
 
         public double AverageSpeedMetresS
         {
-            get => TotalTimeSeconds > 0 ? DistanceMeters / TotalTimeSeconds : 0;
+            get
+            {
+                if (TotalTimeSeconds > 0)
+                {
+                    return DistanceMeters / TotalTimeSeconds;
+                }
+                if (lap.AverageSpeedValue > 0)
+                {
+                    return lap.AverageSpeedValue;
+                }
+                return 0;
+            }
         }
 
         public double AverageSpeedKmH
         {
             get => AverageSpeedMetresS * 3.6;
+        }
+
+        public double SpeedKmH
+        {
+            get => AverageSpeedKmH;
         }
 
         public Pace AveragePace
@@ -169,14 +185,47 @@ namespace TcxChart
         {
             get 
             {
-                var totalSeconds = lap.Track.TrackPoints.Sum(t => t.Interval.TotalSeconds);
-                return totalSeconds <= 0 ? 0 : lap.Track.TrackPoints.Sum(t => (double)t.HeartRateBpm * t.Interval.TotalSeconds) / totalSeconds;
+                if (lap.Track.TrackPoints.Any())
+                {
+                    var totalSeconds = lap.Track.TrackPoints.Sum(t => t.Interval.TotalSeconds);
+                    return totalSeconds <= 0 ? 0 : lap.Track.TrackPoints.Sum(t => (double)t.HeartRateBpm * t.Interval.TotalSeconds) / totalSeconds;
+                }
+                else
+                {
+                    return lap.AverageHeartRateBpmValue;
+                }
             }
+        }
+
+        public int HeartRateBpm
+        {
+            get => (int) Math.Round(AverageHeartRateBpm);
+        }
+
+        public double AverageRunCadence
+        {
+            get
+            {
+                if (lap.Track.TrackPoints.Any())
+                {
+                    var totalSeconds = lap.Track.TrackPoints.Sum(t => t.Interval.TotalSeconds);
+                    return totalSeconds <= 0 ? 0 : lap.Track.TrackPoints.Sum(t => (double)t.RunCadence * t.Interval.TotalSeconds) / totalSeconds;
+                }
+                else
+                {
+                    return lap.AverageRunCadenceValue;
+                }
+            }
+        }
+
+        public double RunCadence
+        {
+            get => AverageRunCadence;
         }
 
         public double MaxSpeedMetresS
         {
-            get => lap.Track.TrackPoints.Max(t => t.Speed);
+            get => lap.Track.TrackPoints.Any() ? lap.Track.TrackPoints.Max(t => t.Speed) : lap.MaximumSpeedValue;
         }
 
         public double MaxSpeedKmH
@@ -191,7 +240,7 @@ namespace TcxChart
 
         public int MaxHeartRateBpm
         {
-            get => lap.Track.TrackPoints.Max(t => t.HeartRateBpm);
+            get => lap.Track.TrackPoints.Any() ? lap.Track.TrackPoints.Max(t => t.HeartRateBpm) : lap.MaximumHeartRateBpmValue;
         }
 
         public double Ascent

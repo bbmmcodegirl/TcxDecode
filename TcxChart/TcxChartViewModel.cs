@@ -18,6 +18,8 @@ namespace TcxChart
 
         public TcxChartViewModel()
         {
+            var tcxGetter = new TcxGetter();
+            tcxGetter.Sync();
             if (!Directory.Exists(sourceDirectory))
             {
                 Directory.CreateDirectory(sourceDirectory);
@@ -44,7 +46,9 @@ namespace TcxChart
                         activities.AddRange(loadedActivities.Select(a => new ActivityViewModel(file, a)));
                     }
                 }
-                catch { }
+                catch (Exception e)
+                {
+                }
             }
 
             sourceFiles = Directory.GetFiles(sourceDirectory, "*.tcxml").ToList();
@@ -74,6 +78,8 @@ namespace TcxChart
                 Activities.Add(newestActivity);
                 newestActivity.PropertyChanged += someActivityChanged;
             }
+            
+            SelectedSportTypes.AddRange(SportTypes);
         }
 
         private void someActivityChanged(object sender, PropertyChangedEventArgs e)
@@ -85,6 +91,35 @@ namespace TcxChart
         }
 
         public ObservableCollection<ActivityViewModel> Activities { get; } = new ObservableCollection<ActivityViewModel>();
+
+        public List<String> SportTypes { get => Activities.Select(a => a.Sport).Distinct().ToList(); }
+
+        private List<String> SelectedSportTypes = new List<string>();
+
+        public void SportTypeSelected(string sport)
+        {
+            if (!SelectedSportTypes.Contains(sport))
+            {
+                SelectedSportTypes.Add(sport);
+            }
+        }
+
+        public void SportTypeUnselected(string sport)
+        {
+            if (SelectedSportTypes.Contains(sport))
+            {
+                SelectedSportTypes.Remove(sport);
+            }
+        }
+
+        public bool SportFilter(object obj)
+        {
+            if (obj is ActivityViewModel activity)
+            {
+                return SelectedSportTypes.Contains(activity.Sport);
+            }
+            return false;
+        }
 
         public void SaveActivitiesIfDirty()
         {

@@ -126,10 +126,17 @@ namespace TcxDecode
             }
 
             var heartRateElement = element.Descendants().Where(d => d.Name.LocalName == "HeartRateBpm").FirstOrDefault();
-            var heartRateValue = heartRateElement.Descendants().Where(d => d.Name.LocalName == "Value").Select(e => e.Value).FirstOrDefault();
-            if (TcxParser.ParseInt(heartRateValue, out int heartRate))
+            if (heartRateElement != null)
             {
-                trackPoint.HeartRateBpm = heartRate;
+                var heartRateValue = heartRateElement.Descendants().Where(d => d.Name.LocalName == "Value").Select(e => e.Value).FirstOrDefault();
+                if (TcxParser.ParseInt(heartRateValue, out int heartRate))
+                {
+                    trackPoint.HeartRateBpm = heartRate;
+                }
+            }
+            else
+            {
+                trackPoint.HeartRateBpm = 0;
             }
 
             return trackPoint;
@@ -215,6 +222,11 @@ namespace TcxDecode
         public Pace TargetMinPace { get; set; }
         public Pace TargetMaxPace { get; set; }
         public Track Track { get; set;  } = new Track();
+        public float AverageSpeedValue { get; set; }
+        public float MaximumSpeedValue { get; set; }
+        public int AverageHeartRateBpmValue { get; set; }
+        public int MaximumHeartRateBpmValue { get; set; }
+        public int AverageRunCadenceValue { get; set; }
 
         public static Lap Parse(XElement element)
         {
@@ -239,14 +251,47 @@ namespace TcxDecode
             var intensityValue = element.Descendants().Where(d => d.Name.LocalName == "Intensity").Select(e => e.Value).FirstOrDefault();
             var triggerMethodValue = element.Descendants().Where(d => d.Name.LocalName == "TriggerMethod").Select(e => e.Value).FirstOrDefault();
 
-            if (TcxParser.ParseFloat(totalSecondsValue, out float totalSeconds))
-            {
-                lap.TotalTimeSeconds = totalSeconds;
-            }
+            var averageSpeedValue = element.Descendants().Where(d => d.Name.LocalName == "AvgSpeed").Select(e => e.Value).FirstOrDefault();
+            var maximumSpeedValue = element.Descendants().Where(d => d.Name.LocalName == "MaximumSpeed").Select(e => e.Value).FirstOrDefault();
+            var averageHeartRateBpmValue = element.Descendants().Where(d => d.Name.LocalName == "AverageHeartRateBpm").Select(e => e.Descendants().Where(d => d.Name.LocalName == "Value").Select(v => v.Value).FirstOrDefault()).FirstOrDefault();
+            var maximumHeartRateBpmValue = element.Descendants().Where(d => d.Name.LocalName == "MaximumHeartRateBpm").Select(e => e.Descendants().Where(d => d.Name.LocalName == "Value").Select(v => v.Value).FirstOrDefault()).FirstOrDefault();
+            var averageRunCadenceValue = element.Descendants().Where(d => d.Name.LocalName == "AvgRunCadence").Select(e => e.Value).FirstOrDefault();
 
             if (TcxParser.ParseFloat(distanceValue, out float distance))
             {
                 lap.DistanceMeters = distance;
+            }
+
+            if (TcxParser.ParseFloat(averageSpeedValue, out float averageSpeed))
+            {
+                lap.AverageSpeedValue = averageSpeed;
+            }
+
+            if (TcxParser.ParseFloat(totalSecondsValue, out float totalSeconds))
+            {
+                if (totalSeconds > 0)
+                {
+                    lap.TotalTimeSeconds = totalSeconds;
+                }
+                else if (lap.DistanceMeters > 0 && lap.AverageSpeedValue > 0)
+                {
+                    lap.TotalTimeSeconds = lap.DistanceMeters/lap.AverageSpeedValue;
+                }
+            }
+
+            if (TcxParser.ParseFloat(maximumSpeedValue, out float maximumSpeed))
+            {
+                lap.MaximumSpeedValue = maximumSpeed;
+            }
+
+            if (TcxParser.ParseInt(averageHeartRateBpmValue, out int averageHeartRateBpm))
+            {
+                lap.AverageHeartRateBpmValue = averageHeartRateBpm;
+            }
+
+            if (TcxParser.ParseInt(maximumHeartRateBpmValue, out int maximumHeartRateBpm))
+            {
+                lap.MaximumHeartRateBpmValue = maximumHeartRateBpm;
             }
 
             if (TcxParser.ParseInt(caloriesValue, out int calories))
@@ -254,13 +299,25 @@ namespace TcxDecode
                 lap.Calories = calories;
             }
 
+            if (TcxParser.ParseInt(averageRunCadenceValue, out int averageRunCadence))
+            {
+                lap.AverageRunCadenceValue = averageRunCadence;
+            }
+
             lap.Intensity = intensityValue;
             lap.TriggerMethod = triggerMethodValue;
 
             var trackElement = element.Descendants().Where(d => d.Name.LocalName == "Track").FirstOrDefault();
 
-            lap.Track = Track.Parse(trackElement);
-            
+            if (trackElement != null)
+            {
+                lap.Track = Track.Parse(trackElement);
+            }
+            else
+            {
+                lap.Track = new Track();
+            }
+
             return lap;
         }
     }

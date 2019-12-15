@@ -30,11 +30,14 @@ namespace TcxChart
         private void analyseLaps()
         {
             var lDist = Laps.Sum(l => l.DistanceMeters);
-            var tDist = Laps.SelectMany(l => l.TrackPoints).Max(t => t.DistanceMeters);
-            if (lDist != tDist)
+            var lapsWithTrackPoints = Laps.Where(l => l.TrackPoints != null && l.TrackPoints.Any()).ToList();
+            if (lapsWithTrackPoints.Any())
             {
-                Debugger.Log(1, "", $"Laps inconsistent: trackpoints cover {100.0 * tDist / lDist}% of lap distance ({tDist} vs {lDist})\r\n");
-
+                var tDist = lapsWithTrackPoints.SelectMany(l => l.TrackPoints).Max(t => t.DistanceMeters);
+                if (lDist != tDist)
+                {
+                    Debugger.Log(1, "", $"Laps inconsistent: trackpoints cover {100.0 * tDist / lDist}% of lap distance ({tDist} vs {lDist})\r\n");
+                }
             }
             TrackPoint lastTrackPoint = null;
             var totalDistance = 0.0;
@@ -54,7 +57,10 @@ namespace TcxChart
                     lastTrackPoint = trackpoint;
                 }
             }
-            lastTrackPoint.Interval = EndTime - lastTrackPoint.Time;
+            if (lastTrackPoint != null)
+            {
+                lastTrackPoint.Interval = EndTime - lastTrackPoint.Time;
+            }
         }
 
         public string FileName { get; }
@@ -162,6 +168,32 @@ namespace TcxChart
             get => Laps.Max(h => h.MaxSpeedKmH);
         }
 
+        public double MaxCadence
+        {
+            get
+            {
+                var trackPoints = Laps.SelectMany(l => l.TrackPoints);
+                if (trackPoints.Any())
+                {
+                    return trackPoints.Max(t => t.RunCadence);
+                }
+                return Laps.Max(l => l.RunCadence);
+            }
+        }
+
+        public double MaxElevation
+        {
+            get
+            {
+                var trackPoints = Laps.SelectMany(l => l.TrackPoints);
+                if (trackPoints.Any())
+                {
+                    return trackPoints.Max(t => t.AltitudeMeters);
+                }
+                return 0.0;
+            }
+        }
+
         public double AverageSpeed
         {
             get => Duration.TotalHours <= 0 ? 0 : Distance / Duration.TotalHours;
@@ -188,9 +220,22 @@ namespace TcxChart
             get => Laps.Max(h => h.MaxHeartRateBpm);
         }
 
-        public int AverageHeartRate
+        public double AverageHeartRate
         {
-            get => (int)Math.Round(Laps.SelectMany(l => l.TrackPoints).Average(t => (double)t.HeartRateBpm));
+            get
+            {
+                var totalSeconds = Duration.TotalSeconds;
+                return totalSeconds <= 0 ? 0 : Laps.Sum(t => (double)t.AverageHeartRateBpm * t.Duration.TotalSeconds) / totalSeconds;
+            }
+        }
+
+        public double AverageRunCadence
+        {
+            get
+            {
+                var totalSeconds = Duration.TotalSeconds;
+                return totalSeconds <= 0 ? 0 : Laps.Sum(t => (double)t.AverageRunCadence * t.Duration.TotalSeconds) / totalSeconds;
+            }
         }
 
         public double TotalAscent
@@ -219,6 +264,11 @@ namespace TcxChart
             var lapProperty = typeof(LapViewModel).GetProperties()
                 .FirstOrDefault(p => propertyType.IsAssignableFrom(p.PropertyType) &&
                 p.Name == propertyName &&
+                p.GetMethod != null &&
+                !p.GetMethod.GetParameters().Any());
+            var lapAverageProperty = typeof(LapViewModel).GetProperties()
+                .FirstOrDefault(p => propertyType.IsAssignableFrom(p.PropertyType) &&
+                p.Name == $"Average{propertyName}" &&
                 p.GetMethod != null &&
                 !p.GetMethod.GetParameters().Any());
             if (trackpointProperty == null && lapProperty == null)

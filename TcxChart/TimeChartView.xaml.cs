@@ -47,8 +47,8 @@ namespace TcxChart
 
             var maxHeartRate = ViewModel.MaxHeartRate;
             var maxSpeed = ViewModel.MaxSpeed;
-            var maxCadence = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.RunCadence);
-            var maxElevation = ViewModel.Laps.SelectMany(l => l.TrackPoints).Max(t => t.AltitudeMeters);
+            var maxCadence = ViewModel.MaxCadence;
+            var maxElevation = ViewModel.MaxElevation;
 
             TimeChart.AxisY.Clear();
 
