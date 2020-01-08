@@ -73,7 +73,8 @@
         </Grid>
         <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
             <DataGrid x:Name="LapsGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxHeight="300" MaxWidth="1000"
-                  ItemsSource="{Binding Laps}" SelectionChanged="Lap_SelectionChanged" AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"  >
+                  ItemsSource="{Binding Laps}" SelectionChanged="Lap_SelectionChanged" AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"
+                      MouseRightButtonUp="LapsGrid_MouseRightButtonUp">
             </DataGrid>
         </ScrollViewer>
         <GridSplitter Grid.Row="2" Grid.Column="0" Height="5" HorizontalAlignment="Stretch"  ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" />

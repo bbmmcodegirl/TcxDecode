@@ -43,6 +43,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -64,7 +65,7 @@
                 </ListView.ItemContainerStyle>
             </ListView>
         </StackPanel>
-        <Button x:Name="SaveButton" Grid.Row="2"  Visibility="{Binding IsDirty, Converter={StaticResource booleanToVisibilityConverter}}" Click="save_click" MaxHeight="60">Save</Button>
+        <Button x:Name="SaveButton" Grid.Row="1"  Visibility="{Binding IsDirty, Converter={StaticResource booleanToVisibilityConverter}}" Click="save_click" MaxHeight="60">Save</Button>
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Visibility="{Binding CurrentActivity, Converter={StaticResource existenceToVisibilityConverter}}">
             <local:ActivityView Margin="10" DataContext="{Binding CurrentActivity}" VerticalAlignment="Stretch"/>
         </StackPanel>

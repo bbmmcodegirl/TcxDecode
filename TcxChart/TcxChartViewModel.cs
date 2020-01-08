@@ -18,8 +18,6 @@ namespace TcxChart
 
         public TcxChartViewModel()
         {
-            var tcxGetter = new TcxGetter();
-            tcxGetter.Sync();
             if (!Directory.Exists(sourceDirectory))
             {
                 Directory.CreateDirectory(sourceDirectory);

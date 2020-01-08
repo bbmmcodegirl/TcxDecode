@@ -43,7 +43,7 @@ namespace TcxChart
 
         public int Index
         {
-            get; private set;
+            get; set;
         }
 
         public string Name
@@ -302,6 +302,12 @@ namespace TcxChart
             Notify(nameof(AverageSpeedMetresS));
             Notify(nameof(AverageSpeedKmH));
             Notify(nameof(AveragePace));
+        }
+
+        internal List<LapViewModel> Split(double distanceMeters)
+        {
+            var newLaps = this.lap.Split(distanceMeters);
+            return newLaps.Select((l, i) => new LapViewModel(l, this.Index + i)).ToList();
         }
     }
 }

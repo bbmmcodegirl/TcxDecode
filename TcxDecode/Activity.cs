@@ -320,5 +320,42 @@ namespace TcxDecode
 
             return lap;
         }
+
+        public List<Lap> Split(double distanceMeters)
+        {
+            var list = new List<Lap>();
+            int i = 0;
+            do
+            {
+                var newTrackPoints = Track.TrackPoints.SkipWhile(t => t.DistanceMeters < distanceMeters * i).TakeWhile(t => t.DistanceMeters < distanceMeters * (i + 1)).ToList();
+                if (!newTrackPoints.Any())
+                {
+                    break;
+                }
+                var subTrack = new Track()
+                {
+                    TrackPoints = newTrackPoints.ToArray()
+                };
+                // TODO make the laps exactly the required distance
+                var partialLap = new Lap()
+                {
+                    Name = $"{Name}{i + 1}",
+                    StartTime = newTrackPoints.OrderBy(t => t.Time).Select(t => t.Time).First(),
+                    TotalTimeSeconds = (float)(newTrackPoints.OrderBy(t => t.Time).Select(t => t.Time).Last() - newTrackPoints.OrderBy(t => t.Time).Select(t => t.Time).First()).TotalSeconds,
+                    DistanceMeters = (float)(newTrackPoints.Max(t => t.DistanceMeters) - newTrackPoints.Min(t => t.DistanceMeters)),
+                    Intensity = this.Intensity,
+                    TriggerMethod = i == 0 ? this.TriggerMethod : "Fixed distance",
+                    Track = subTrack,
+                    AverageSpeedValue = (float)newTrackPoints.Average(t => t.Speed),
+                    MaximumSpeedValue = (float)newTrackPoints.Max(t => t.Speed),
+                    AverageHeartRateBpmValue = (int)Math.Round(newTrackPoints.Average(t => (double)t.HeartRateBpm)),
+                    MaximumHeartRateBpmValue = newTrackPoints.Max(t => t.HeartRateBpm),
+                    AverageRunCadenceValue = (int)Math.Round(newTrackPoints.Average(t => (double)t.RunCadence)),
+                };
+                list.Add(partialLap);
+                i++;
+            } while (true);
+            return list;
+        }
     }
 }

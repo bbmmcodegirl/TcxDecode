@@ -146,7 +146,7 @@ namespace TcxChart
                     dataGridTextColumn.Binding.StringFormat = @"{0:H\:mm\:ss}";
                 }
             }
-            if (e.PropertyName== nameof(Track.TrackPoints))
+            if (e.PropertyName == nameof(Track.TrackPoints))
             {
                 e.Cancel = true;
             }
@@ -162,6 +162,33 @@ namespace TcxChart
             if (ViewModel != null)
             {
                 _multiDay = ViewModel.Laps.Select(l => l.StartTime.Date).Distinct().Count() > 1;
+            }
+        }
+
+        private void LapsGrid_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // TODO display a dialog and ask the user first for the distance to split
+            DependencyObject dep = (DependencyObject)e.OriginalSource;
+
+            // iteratively traverse the visual tree
+            while ((dep != null) &&
+                !(dep is DataGridRow))
+            {
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+
+            if (dep == null)
+                return;
+
+            if (dep is DataGridRow)
+            {
+                DataGridRow row = dep as DataGridRow;
+                var item = row.Item;
+                var lap = item as LapViewModel;
+                if (lap != null)
+                {
+                    this.ViewModel.SplitLap(lap, distanceMeters: 1000);
+                }
             }
         }
     }

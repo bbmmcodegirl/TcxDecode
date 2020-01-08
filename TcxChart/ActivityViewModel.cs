@@ -19,7 +19,7 @@ namespace TcxChart
         {
             this.activity = activity;
             FileName = fileName;
-            Laps = activity.Laps.OrderBy(l => l.StartTime).Select((l, i) => new LapViewModel(l, i+1)).ToList();
+            Laps = new ObservableCollection<LapViewModel>(activity.Laps.OrderBy(l => l.StartTime).Select((l, i) => new LapViewModel(l, i+1)));
             foreach (var lap in Laps)
             {
                 lap.PropertyChanged += someLapPropertyChanged;
@@ -94,7 +94,7 @@ namespace TcxChart
         public bool DoShowElevationChange              { get => _doShowElevationChange   ;  set { _doShowElevationChange      = value; Notify(); } }
 
 
-        public List<LapViewModel> Laps { get; private set; }
+        public ObservableCollection<LapViewModel> Laps { get; private set; }
 
         public string Name
         {
@@ -227,6 +227,25 @@ namespace TcxChart
                 var totalSeconds = Duration.TotalSeconds;
                 return totalSeconds <= 0 ? 0 : Laps.Sum(t => (double)t.AverageHeartRateBpm * t.Duration.TotalSeconds) / totalSeconds;
             }
+        }
+
+        internal void SplitLap(LapViewModel lap, int distanceMeters)
+        {
+            var myLap = Laps.FirstOrDefault(l => l == lap);
+            var newLaps = myLap.Split(distanceMeters);
+            var lapIndex = Laps.IndexOf(myLap);
+            Laps.Remove(myLap);
+            foreach(var newLap in newLaps)
+            {
+                Laps.Insert(lapIndex, newLap);
+                lapIndex++;
+            }
+            for (int iLap = 0; iLap < Laps.Count; iLap++)
+            {
+                var l = Laps[iLap];
+                l.Index = iLap + 1;
+            }
+            Notify(nameof(Laps));
         }
 
         public double AverageRunCadence
