@@ -75,20 +75,22 @@ namespace TcxChart
             return activity.activity;
         }
 
-        bool _doShowSpeed = true;
+        bool _doShowSpeed = false;
         bool _doShowTargetSpeed = false;
         bool _doShowPace = false;
         bool _doShowTargetPace = false;
-        bool _doShowCadence = false;
-        bool _doShowHeartRate = true;
+        bool _doShowCadence = true;
+        bool _doShowStrideLength = true;
+        bool _doShowHeartRate = false;
         bool _doShowElevation = false;
         bool _doShowElevationChange = false;
 
         public bool DoShowSpeed                        { get => _doShowSpeed             ;  set { _doShowSpeed                = value; Notify(); } }
         public bool DoShowTargetSpeed                  { get => _doShowTargetSpeed       ;  set { _doShowTargetSpeed          = value; Notify(); } }
-        public bool DoShowPace                         { get => _doShowPace              ;  set { _doShowPace                = value; Notify(); } }
-        public bool DoShowTargetPace                   { get => _doShowTargetPace        ;  set { _doShowTargetPace          = value; Notify(); } }
+        public bool DoShowPace                         { get => _doShowPace              ;  set { _doShowPace                 = value; Notify(); } }
+        public bool DoShowTargetPace                   { get => _doShowTargetPace        ;  set { _doShowTargetPace           = value; Notify(); } }
         public bool DoShowCadence                      { get => _doShowCadence           ;  set { _doShowCadence              = value; Notify(); } }
+        public bool DoShowStrideLength                 { get => _doShowStrideLength      ;  set { _doShowStrideLength         = value; Notify(); } }
         public bool DoShowHeartRate                    { get => _doShowHeartRate         ;  set { _doShowHeartRate            = value; Notify(); } }
         public bool DoShowElevation                    { get => _doShowElevation         ;  set { _doShowElevation            = value; Notify(); } }
         public bool DoShowElevationChange              { get => _doShowElevationChange   ;  set { _doShowElevationChange      = value; Notify(); } }
@@ -158,12 +160,12 @@ namespace TcxChart
             get => EndTime - StartTime;
         }
 
-        public double Distance
+        public double DistanceKm
         {
             get => Laps.Sum(l => l.DistanceKm);
         }
 
-        public double MaxSpeed
+        public double MaxSpeedKmH
         {
             get => Laps.Max(h => h.MaxSpeedKmH);
         }
@@ -175,9 +177,22 @@ namespace TcxChart
                 var trackPoints = Laps.SelectMany(l => l.TrackPoints);
                 if (trackPoints.Any())
                 {
-                    return trackPoints.Max(t => t.RunCadence);
+                    return trackPoints.Max(t => t.RunCadence)*2;
                 }
-                return Laps.Max(l => l.RunCadence);
+                return Laps.Max(l => l.RunCadence)*2;
+            }
+        }
+
+        public double MaxStrideLengthM
+        {
+            get
+            {
+                var trackPoints = Laps.SelectMany(l => l.TrackPoints);
+                if (trackPoints.Any())
+                {
+                    return trackPoints.Max(t => t.StrideLengthM);
+                }
+                return Laps.Max(l => l.StrideLengthM);
             }
         }
 
@@ -194,9 +209,9 @@ namespace TcxChart
             }
         }
 
-        public double AverageSpeed
+        public double AverageSpeedKmH
         {
-            get => Duration.TotalHours <= 0 ? 0 : Distance / Duration.TotalHours;
+            get => Duration.TotalHours <= 0 ? 0 : DistanceKm / Duration.TotalHours;
         }
 
         public double AverageSpeedInMotion
@@ -207,12 +222,12 @@ namespace TcxChart
 
         public Pace BestPace
         {
-            get => MaxSpeed;
+            get => MaxSpeedKmH;
         }
 
         public Pace AveragePace
         {
-            get => AverageSpeed;
+            get => AverageSpeedKmH;
         }
 
         public int MaxHeartRate
@@ -253,7 +268,20 @@ namespace TcxChart
             get
             {
                 var totalSeconds = Duration.TotalSeconds;
-                return totalSeconds <= 0 ? 0 : Laps.Sum(t => (double)t.AverageRunCadence * t.Duration.TotalSeconds) / totalSeconds;
+                return totalSeconds <= 0 ? 0 : 2* Laps.Sum(t => (double)t.AverageRunCadence * t.Duration.TotalSeconds) / totalSeconds;
+            }
+        }
+
+        public double AverageStrideLengthM
+        {
+            get
+            {
+                var trackPoints = Laps.SelectMany(l => l.TrackPoints);
+                if (trackPoints.Any())
+                {
+                    return trackPoints.Average(t => t.StrideLengthM);
+                }
+                return Laps.Average(l => l.StrideLengthM);
             }
         }
 

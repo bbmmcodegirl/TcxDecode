@@ -32,8 +32,11 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -56,6 +59,11 @@
             <TextBlock Grid.Row="2" Grid.Column="4" Text="Max Heart Rate"/>
             <TextBlock Grid.Row="3" Grid.Column="4" Text="Average Heart Rate"/>
 
+            <TextBlock Grid.Row="0" Grid.Column="6" Text="Max Cadence"/>
+            <TextBlock Grid.Row="1" Grid.Column="6" Text="Average Cadence"/>
+            <TextBlock Grid.Row="2" Grid.Column="6" Text="Max Stride Length"/>
+            <TextBlock Grid.Row="3" Grid.Column="6" Text="Average Stride Length"/>
+
             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Margin="5,0,5,0"/>
             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Sport}" Margin="5,0,5,0"/>
             <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding StartTime}" Margin="5,0,5,0"/>
@@ -70,6 +78,11 @@
             <TextBlock Grid.Row="1" Grid.Column="5" Text="{Binding AveragePace}" Margin="5,0,5,0"/>
             <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding MaxHeartRate}" Margin="5,0,5,0"/>
             <TextBlock Grid.Row="3" Grid.Column="5" Text="{Binding AverageHeartRate}" Margin="5,0,5,0"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="7" Text="{Binding MaxCadence}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="1" Grid.Column="7" Text="{Binding AverageRunCadence}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="2" Grid.Column="7" Text="{Binding MaxStrideLengthM}" Margin="5,0,5,0"/>
+            <TextBlock Grid.Row="3" Grid.Column="7" Text="{Binding AverageStrideLengthM}" Margin="5,0,5,0"/>
         </Grid>
         <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
             <DataGrid x:Name="LapsGrid"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxHeight="300" MaxWidth="1000"
@@ -93,6 +106,7 @@
                 <CheckBox IsChecked="{Binding DoShowPace}">Pace</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowTargetPace}">Target Pace</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowCadence}">Cadence</CheckBox>
+                <CheckBox IsChecked="{Binding DoShowStrideLength}">Stride Length</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowHeartRate}">Heart Rate</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowElevation}">Elevation</CheckBox>
                 <CheckBox IsChecked="{Binding DoShowElevationChange}">Elevation Change</CheckBox>

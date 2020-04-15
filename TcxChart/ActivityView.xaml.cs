@@ -126,7 +126,7 @@ namespace TcxChart
                     dataGridTextColumn.Binding.StringFormat = @"{0:0} bpm";
                 }
             }
-            else if (new string[] { nameof(LapViewModel.IsDirty), nameof(Lap.Intensity), nameof(Lap.TriggerMethod), nameof(LapViewModel.DistanceKm) }.Contains(e.PropertyName))
+            else if (new string[] { nameof(LapViewModel.IsDirty), nameof(Lap.Intensity), nameof(Lap.TriggerMethod), nameof(LapViewModel.DistanceKm), nameof(LapViewModel.RunCadence) }.Contains(e.PropertyName))
             {
                 e.Cancel = true;
             }

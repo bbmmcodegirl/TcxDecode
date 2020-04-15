@@ -46,9 +46,10 @@ namespace TcxChart
             var xValues = ViewModel.GetTimeSeries(numPoints);
 
             var maxHeartRate = ViewModel.MaxHeartRate;
-            var maxSpeed = ViewModel.MaxSpeed;
+            var maxSpeed = ViewModel.MaxSpeedKmH;
             var maxCadence = ViewModel.MaxCadence;
             var maxElevation = ViewModel.MaxElevation;
+            var maxStrideLength = ViewModel.MaxStrideLengthM;
 
             TimeChart.AxisY.Clear();
 
@@ -57,12 +58,14 @@ namespace TcxChart
             bool showAnyPace = ViewModel.DoShowPace || ViewModel.DoShowTargetPace;
             bool showAnyElevation = ViewModel.DoShowElevation || ViewModel.DoShowElevationChange;
             bool showAnyCadence = ViewModel.DoShowCadence;
+            bool showAnyStrideLength = ViewModel.DoShowStrideLength;
 
             int speedAxisIndex = -1;
             int heartRateAxisIndex = -1;
             int paceAxisIndex = -1;
             int elevationAxisIndex = -1;
             int cadenceAxisIndex = -1;
+            int strideLengthAxisIndex = -1;
             if (showAnySpeed)
             {
                 var speedAxis = new Axis()
@@ -126,6 +129,18 @@ namespace TcxChart
                 };
                 cadenceAxisIndex = TimeChart.AxisY.Count;
                 TimeChart.AxisY.Add(cadenceAxis);
+            }
+            if (showAnyStrideLength)
+            {
+                var strideLength = new Axis()
+                {
+                    Title = "StrideLength (m)",
+                    Foreground = System.Windows.Media.Brushes.Teal,
+                    LabelFormatter = value => value.ToString("0.0"),
+                    Position = AxisPosition.RightTop
+                };
+                strideLengthAxisIndex = TimeChart.AxisY.Count;
+                TimeChart.AxisY.Add(strideLength);
             }
 
             var seriesCollection = new SeriesCollection();
@@ -221,6 +236,7 @@ namespace TcxChart
                 if (maxCadence > 0)
                 {
                     var cadences = ViewModel.GetTimeLine<double>(nameof(TrackPoint.RunCadence), numPoints);
+                    cadences = cadences.Select(c => c * 2).ToList();
                     var series = new LineSeries
                     {
                         Title = "Cadence",
@@ -231,6 +247,26 @@ namespace TcxChart
                         LabelPoint = chartPoint => $"{chartPoint.Y.ToString("0")} steps/min",
                         Stroke = TimeChart.AxisY[cadenceAxisIndex].Foreground,
                         ScalesYAt = cadenceAxisIndex
+                    };
+                    seriesCollection.Add(series);
+                }
+            }
+
+            if (ViewModel.DoShowStrideLength)
+            {
+                if (maxStrideLength > 0)
+                {
+                    var strideLengths = ViewModel.GetTimeLine<double>(nameof(TrackPoint.StrideLengthM), numPoints);
+                    var series = new LineSeries
+                    {
+                        Title = "StrideLength",
+                        Values = new ChartValues<double>(strideLengths),
+                        PointGeometry = null,
+                        Fill = Brushes.Transparent,
+                        LineSmoothness = 0,
+                        LabelPoint = chartPoint => $"{chartPoint.Y.ToString("0.0")} m",
+                        Stroke = TimeChart.AxisY[strideLengthAxisIndex].Foreground,
+                        ScalesYAt = strideLengthAxisIndex
                     };
                     seriesCollection.Add(series);
                 }

@@ -65,6 +65,14 @@ namespace TcxDecode
         public double SpeedKmH { get => Speed * 3.6; }
 
         public double RunCadence { get; set; }
+
+        public double StrideLengthM { get =>
+                    RunCadence == 0 
+                        ? 0 
+                        : (SpeedKmH * 1000/60.0) // m per min == distance in m covered per min
+                           / (RunCadence*2) // distance in m covered per stride
+                ; }
+
         public TimeSpan Interval { get; set; }
         public double DistanceCoveredMeters { get; set; }
 

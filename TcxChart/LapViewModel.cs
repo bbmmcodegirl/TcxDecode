@@ -209,11 +209,12 @@ namespace TcxChart
                 if (lap.Track.TrackPoints.Any())
                 {
                     var totalSeconds = lap.Track.TrackPoints.Sum(t => t.Interval.TotalSeconds);
-                    return totalSeconds <= 0 ? 0 : lap.Track.TrackPoints.Sum(t => (double)t.RunCadence * t.Interval.TotalSeconds) / totalSeconds;
+                    return totalSeconds <= 0 ? 0 : lap.Track.TrackPoints.Sum(t => (double)t.RunCadence * 2 // run cadence measures double steps, but garmin device usually shows single steps
+                        * t.Interval.TotalSeconds) / totalSeconds;
                 }
                 else
                 {
-                    return lap.AverageRunCadenceValue;
+                    return lap.AverageRunCadenceValue * 2; // run cadence measures double steps, but garmin device usually shows single steps
                 }
             }
         }
@@ -232,6 +233,13 @@ namespace TcxChart
         {
             get => MaxSpeedMetresS * 3.6;
         }
+
+        public double StrideLengthM { get =>
+                    RunCadence == 0 
+                        ? 0 
+                        : (AverageSpeedKmH * 1000/60.0) // m per min == distance in m covered per min
+                           / RunCadence // distance in m covered per stride
+                ; }
 
         public Pace BestPace
         {
